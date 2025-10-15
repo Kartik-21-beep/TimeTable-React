@@ -1,8 +1,10 @@
 import { Router } from 'express'
-import { getTimetable, getElectives, chooseElectives } from '../controllers/student.controller.js'
+import { getTimetable, getTodayTimetable, getBatch, getElectives, chooseElectives } from '../controllers/student.controller.js'
 
 const r = Router()
-r.get('/timetable/:batch_id', getTimetable)
+r.get('/batches/:batch_id', getBatch)
+r.get('/:batch_id/timetable', getTimetable)
+r.get('/:batch_id/today', getTodayTimetable)
 r.get('/electives/:batch_id', getElectives)
 r.post('/electives/:batch_id', chooseElectives)
 export default r

@@ -7,12 +7,18 @@ export default function ManageFaculty() {
   const [departments, setDepartments] = useState([])
   const [form, setForm] = useState({ faculty_id: null, name: '', email: '', primary_department_id: '', max_load_per_week: 12, is_active: true })
   const [error, setError] = useState('')
+  const [teaching, setTeaching] = useState([])
 
   const load = async () => {
     try {
-      const [deps, facs] = await Promise.all([get('/admin/departments'), get('/admin/faculty')])
+      const [deps, facs, report] = await Promise.all([
+        get('/admin/departments'),
+        get('/admin/faculty'),
+        get('/admin/faculty-teaching').catch(() => [])
+      ])
       setDepartments(deps.map(d => ({ value: d.department_id, label: `${d.code} - ${d.name}` })))
       setItems(facs)
+      setTeaching(report)
     } catch (e) { setError(e.message) }
   }
   useEffect(() => { load() }, [])
@@ -74,6 +80,28 @@ export default function ManageFaculty() {
                 <td style={{ textAlign: 'right' }}>
                   <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
                   <button className="btn secondary" onClick={()=>onDelete(row.faculty_id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="card">
+        <h3 style={{ marginTop: 0 }}>Who teaches what</h3>
+        <table>
+          <thead>
+            <tr><th>Faculty</th><th>Email</th><th>Subjects</th></tr>
+          </thead>
+          <tbody>
+            {teaching.map(row => (
+              <tr key={row.faculty.faculty_id}>
+                <td>{row.faculty.name}</td>
+                <td>{row.faculty.email || '-'}</td>
+                <td>
+                  {row.subjects && row.subjects.length > 0 ? row.subjects.map(s => (
+                    <span key={s.subject_id} className="chip">{s.subject_code} — {s.name}</span>
+                  )) : '—'}
                 </td>
               </tr>
             ))}

@@ -1,7 +1,29 @@
-import { Timetable, ElectiveGroup, ElectiveSubject } from '../models/index.js'
+import { TimetableEntry, ElectiveGroup, ElectiveSubject, Batch } from '../models/index.js'
 
 export const getTimetable = async (req, res, next) => {
-  try { res.json(await Timetable.findAll({ where: { batch_id: req.params.batch_id } })) } catch (e) { next(e) }
+  try { 
+    res.json(await TimetableEntry.findAll({ where: { batch_id: req.params.batch_id } })) 
+  } catch (e) { next(e) }
+}
+
+export const getTodayTimetable = async (req, res, next) => {
+  try {
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' })
+    res.json(await TimetableEntry.findAll({ 
+      where: { 
+        batch_id: req.params.batch_id,
+        day_of_week: today
+      } 
+    })) 
+  } catch (e) { next(e) }
+}
+
+export const getBatch = async (req, res, next) => {
+  try {
+    const batch = await Batch.findByPk(req.params.batch_id)
+    if (!batch) return res.status(404).json({ message: 'Batch not found' })
+    res.json(batch)
+  } catch (e) { next(e) }
 }
 
 export const getElectives = async (req, res, next) => {

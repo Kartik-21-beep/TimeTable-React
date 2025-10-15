@@ -24,6 +24,10 @@ export default function Sidebar({ role }) {
           <Link className="nav-link" to="/admin/elective-groups">Elective Groups</Link>
           <Link className="nav-link" to="/admin/elective-subjects">Elective Subjects</Link>
           <Link className="nav-link" to="/admin/batch-electives">Batch Elective Choice</Link>
+          <Link className="nav-link" to="/admin/department-constraints">Department Constraints</Link>
+          <Link className="nav-link" to="/admin/time-slots">Time Slots</Link>
+          <Link className="nav-link" to="/admin/academic-terms">Academic Terms</Link>
+          <Link className="nav-link" to="/admin/clear-timetable">Clear Timetable</Link>
           <Link className="nav-link" to="/admin/generate">Generate Timetable</Link>
           <Link className="nav-link" to="/admin/logs">Generation Logs</Link>
         </div>
@@ -33,6 +37,7 @@ export default function Sidebar({ role }) {
           <div className="nav-title">Faculty</div>
           <Link className="nav-link" to="/faculty/dashboard">Dashboard</Link>
           <Link className="nav-link" to="/faculty/timetable">My Timetable</Link>
+          <Link className="nav-link" to="/faculty/availability">Manage Availability</Link>
         </div>
       )}
       {role === 'Viewer' && (

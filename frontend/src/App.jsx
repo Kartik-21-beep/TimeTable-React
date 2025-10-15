@@ -14,10 +14,15 @@ import ManageClassrooms from './pages/Admin/ManageClassrooms'
 import ManageElectiveGroups from './pages/Admin/ManageElectiveGroups'
 import ManageElectiveSubjects from './pages/Admin/ManageElectiveSubjects'
 import BatchElectiveChoice from './pages/Admin/BatchElectiveChoice'
+import ManageDepartmentConstraints from './pages/Admin/ManageDepartmentConstraints'
+import ManageTimeSlots from './pages/Admin/ManageTimeSlots'
+import ClearTimetable from './pages/Admin/ClearTimetable'
+import ManageAcademicTerms from './pages/Admin/ManageAcademicTerms'
 import GenerateTimetable from './pages/Admin/GenerateTimetable'
 import ViewGenerationLogs from './pages/Admin/ViewGenerationLogs'
 import FacultyDashboard from './pages/Faculty/FacultyDashboard'
 import FacultyTimetable from './pages/Faculty/MyTimetable'
+import ManageAvailability from './pages/Faculty/ManageAvailability'
 import StudentDashboard from './pages/Student/StudentDashboard'
 import StudentTimetable from './pages/Student/MyTimetable'
 import ChooseElectives from './pages/Student/ChooseElectives'
@@ -67,6 +72,10 @@ export default function App() {
               <Route path="elective-groups" element={<ManageElectiveGroups />} />
               <Route path="elective-subjects" element={<ManageElectiveSubjects />} />
               <Route path="batch-electives" element={<BatchElectiveChoice />} />
+              <Route path="department-constraints" element={<ManageDepartmentConstraints />} />
+              <Route path="time-slots" element={<ManageTimeSlots />} />
+              <Route path="clear-timetable" element={<ClearTimetable />} />
+              <Route path="academic-terms" element={<ManageAcademicTerms />} />
               <Route path="generate" element={<GenerateTimetable />} />
               <Route path="logs" element={<ViewGenerationLogs />} />
               <Route path="*" element={<Navigate to="dashboard" replace />} />
@@ -81,6 +90,7 @@ export default function App() {
             <Routes>
               <Route path="dashboard" element={<FacultyDashboard />} />
               <Route path="timetable" element={<FacultyTimetable />} />
+              <Route path="availability" element={<ManageAvailability />} />
               <Route path="*" element={<Navigate to="dashboard" replace />} />
             </Routes>
           </AppLayout>

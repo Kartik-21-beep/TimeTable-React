@@ -3,6 +3,7 @@ import cors from 'cors'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 import { sequelize } from './src/config/db.js'
+import { Faculty, Batch } from './src/models/index.js'
 import authRoutes from './src/routes/auth.routes.js'
 import adminRoutes from './src/routes/admin.routes.js'
 import facultyRoutes from './src/routes/faculty.routes.js'
@@ -18,6 +19,31 @@ app.use(express.json())
 app.use(morgan('dev'))
 
 app.get('/api/health', (req, res) => res.json({ ok: true }))
+
+// Public routes for signup
+app.get('/api/faculty', async (req, res) => {
+  try {
+    const faculty = await Faculty.findAll({ 
+      where: { is_active: true },
+      attributes: ['faculty_id', 'name', 'email']
+    })
+    res.json(faculty)
+  } catch (e) {
+    res.status(500).json({ message: e.message })
+  }
+})
+
+app.get('/api/batches', async (req, res) => {
+  try {
+    const batches = await Batch.findAll({
+      attributes: ['batch_id', 'name', 'intake_year']
+    })
+    res.json(batches)
+  } catch (e) {
+    res.status(500).json({ message: e.message })
+  }
+})
+
 app.use('/api/auth', authRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/faculty', facultyRoutes)
