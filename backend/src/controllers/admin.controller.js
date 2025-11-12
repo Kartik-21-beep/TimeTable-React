@@ -1,6 +1,19 @@
 import { Department, Program, Semester, Batch, Subject, Faculty, Classroom, ElectiveGroup, ElectiveSubject, BatchElectiveChoice, DepartmentConstraint, TimeSlot, TimetableEntry, AcademicTerm } from '../models/index.js'
 import { sequelize } from '../config/db.js'
 
+// Helper function to reset AUTO_INCREMENT after deletion
+async function resetAutoIncrement(model, pkName = null) {
+  try {
+    const pk = pkName || Object.keys(model.primaryKeys)[0]
+    const tableName = model.getTableName()
+    const [rows] = await sequelize.query(`SELECT COALESCE(MAX(\`${pk}\`), 0) + 1 AS next_id FROM \`${tableName}\``)
+    const nextId = rows && rows[0] ? rows[0].next_id : 1
+    await sequelize.query(`ALTER TABLE \`${tableName}\` AUTO_INCREMENT = ${Number(nextId)}`)
+  } catch (error) {
+    console.error(`Failed to reset AUTO_INCREMENT for ${model.getTableName()}:`, error.message)
+  }
+}
+
 function crud(model) {
   return {
     list: async (req, res, next) => { try { res.json(await model.findAll()) } catch (e) { next(e) } },
@@ -10,14 +23,9 @@ function crud(model) {
       try {
         const pk = Object.keys(model.primaryKeys)[0]
         await model.destroy({ where: Object.fromEntries([[pk, req.params.id]]) })
-
-        // For MySQL: reseed AUTO_INCREMENT to max(pk)+1 to avoid ever-increasing gaps
-        const tableName = model.getTableName()
-        const [rows] = await sequelize.query(`SELECT COALESCE(MAX(${pk}), 0) + 1 AS next_id FROM \`${tableName}\``)
-        const nextId = rows && rows[0] ? rows[0].next_id : 1
-        await sequelize.query(`ALTER TABLE \`${tableName}\` AUTO_INCREMENT = ${Number(nextId)}`)
-
-        res.json({ ok: true })
+        // Reset AUTO_INCREMENT after deletion
+        await resetAutoIncrement(model, pk)
+        res.json({ ok: true, message: 'Deleted and primary key reset' })
       } catch (e) { next(e) }
     }
   }
@@ -37,7 +45,13 @@ export const academicTerms = crud(AcademicTerm)
 export const electiveSubjects = {
   list: async (req, res, next) => { try { res.json(await ElectiveSubject.findAll()) } catch (e) { next(e) } },
   create: async (req, res, next) => { try { const r = await ElectiveSubject.create(req.body); res.json(r) } catch (e) { next(e) } },
-  remove: async (req, res, next) => { try { await ElectiveSubject.destroy({ where: { id: req.params.id } }); res.json({ ok: true }) } catch (e) { next(e) } }
+  remove: async (req, res, next) => { 
+    try { 
+      await ElectiveSubject.destroy({ where: { id: req.params.id } })
+      await resetAutoIncrement(ElectiveSubject, 'id')
+      res.json({ ok: true }) 
+    } catch (e) { next(e) } 
+  }
 }
 
 export const batchElectiveChoices = {
@@ -46,6 +60,7 @@ export const batchElectiveChoices = {
     try {
       const { batch_id, elective_group_id, subject_ids, academic_year } = req.body
       await BatchElectiveChoice.destroy({ where: { batch_id, elective_group_id, academic_year } })
+      await resetAutoIncrement(BatchElectiveChoice)
       if (Array.isArray(subject_ids)) {
         await BatchElectiveChoice.bulkCreate(subject_ids.map(sid => ({ batch_id, elective_group_id, subject_id: sid, academic_year })))
       }
@@ -59,7 +74,13 @@ export const departmentConstraints = {
   list: async (req, res, next) => { try { res.json(await DepartmentConstraint.findAll()) } catch (e) { next(e) } },
   create: async (req, res, next) => { try { const r = await DepartmentConstraint.create(req.body); res.json(r) } catch (e) { next(e) } },
   update: async (req, res, next) => { try { await DepartmentConstraint.update(req.body, { where: { id: req.params.id } }); res.json({ ok: true }) } catch (e) { next(e) } },
-  remove: async (req, res, next) => { try { await DepartmentConstraint.destroy({ where: { id: req.params.id } }); res.json({ ok: true }) } catch (e) { next(e) } }
+  remove: async (req, res, next) => { 
+    try { 
+      await DepartmentConstraint.destroy({ where: { id: req.params.id } })
+      await resetAutoIncrement(DepartmentConstraint, 'id')
+      res.json({ ok: true }) 
+    } catch (e) { next(e) } 
+  }
 }
 
 // Faculty teaching report derived from timetable entries

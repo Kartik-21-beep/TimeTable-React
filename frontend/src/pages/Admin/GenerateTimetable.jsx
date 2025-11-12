@@ -7,15 +7,18 @@ export default function GenerateTimetable() {
   const [departments, setDepartments] = useState([])
   const [programs, setPrograms] = useState([])
   const [batches, setBatches] = useState([])
+  const [semesters, setSemesters] = useState([])
   const [timeSlots, setTimeSlots] = useState([])
   const [subjects, setSubjects] = useState([])
   const [faculty, setFaculty] = useState([])
   const [assignments, setAssignments] = useState([])
   const [academicTerms, setAcademicTerms] = useState([])
-  const [form, setForm] = useState({ department_id: '', program_id: '', batch_id: '', academic_year: '', respect_lunch: true, no_weekends: true, persist: true })
+  const [form, setForm] = useState({ department_id: '', program_id: '', semester_id: '', batch_id: '', academic_year: '', respect_lunch: true, no_weekends: true, persist: true })
   const [result, setResult] = useState([])
   const [message, setMessage] = useState('')
   const [reviewOk, setReviewOk] = useState(false)
+  const [reviewData, setReviewData] = useState(null)
+  const [conflicts, setConflicts] = useState([])
 
   useEffect(() => {
     async function load() {
@@ -61,29 +64,55 @@ export default function GenerateTimetable() {
     load()
   }, [])
 
-  // Load subjects and faculty when selection changes
+  // Load semesters when program changes
   useEffect(() => {
-    async function loadLists() {
-      if (!form.program_id) return
-      // Find current semester(s) for this program by year parity
-      // For simplicity, fetch all subjects under all semesters of program
+    async function loadSemesters() {
+      if (!form.program_id) {
+        setSemesters([])
+        setSubjects([])
+        setAssignments([])
+        return
+      }
       const allSemesters = await get('/admin/semesters')
-      const semIds = allSemesters.filter(s => s.program_id === Number(form.program_id)).map(s => s.semester_id)
-      const subjLists = await Promise.all(semIds.map(id => get(`/admin/list/subjects?semester_id=${id}`)))
-      const flat = subjLists.flat()
-      setSubjects(flat)
-      setFaculty(await get('/admin/list/active-faculty'))
-      // Initialize empty assignments per subject if not present
-      setAssignments(prev => {
-        const map = new Map(prev.map(a => [a.subject_id, a]))
-        for (const s of flat) {
-          if (!map.has(s.subject_id)) map.set(s.subject_id, { subject_id: s.subject_id, faculty_id: '', block_hours: s.type === 'Practical' ? 2 : 1 })
+      const programSemesters = allSemesters
+        .filter(s => s.program_id === Number(form.program_id))
+        .map(s => ({ value: s.semester_id, label: `Semester ${s.semester_number} (${s.semester_type})` }))
+      setSemesters(programSemesters)
+      
+      // Reset semester selection if current semester doesn't belong to new program
+      if (form.semester_id) {
+        const currentSemExists = allSemesters.some(s => 
+          s.semester_id === Number(form.semester_id) && s.program_id === Number(form.program_id)
+        )
+        if (!currentSemExists) {
+          setForm(prev => ({ ...prev, semester_id: '' }))
         }
-        return Array.from(map.values())
-      })
+      }
     }
-    loadLists()
+    loadSemesters()
   }, [form.program_id])
+
+  // Load subjects when semester is selected
+  useEffect(() => {
+    async function loadSubjects() {
+      if (!form.semester_id) {
+        setSubjects([])
+        setAssignments([])
+        return
+      }
+      // Fetch subjects for the selected semester only
+      const semesterSubjects = await get(`/admin/list/subjects?semester_id=${form.semester_id}`)
+      setSubjects(semesterSubjects || [])
+      setFaculty(await get('/admin/list/active-faculty'))
+      // Initialize empty assignments per subject
+      setAssignments((semesterSubjects || []).map(s => ({
+        subject_id: s.subject_id,
+        faculty_id: '',
+        block_hours: s.type === 'Practical' ? 2 : 1
+      })))
+    }
+    loadSubjects()
+  }, [form.semester_id])
 
   const onChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -93,6 +122,8 @@ export default function GenerateTimetable() {
   const onSubmit = async (e) => {
     e.preventDefault(); setMessage('Generating...')
     setReviewOk(false)
+    setConflicts([])
+    setReviewData(null)
     // Require at least one assignment with a selected faculty
     const selected = assignments.filter(a => a && a.faculty_id)
     if (selected.length === 0) {
@@ -128,16 +159,48 @@ export default function GenerateTimetable() {
   }
 
   const onReview = async () => {
+    if (!result || result.length === 0) {
+      setMessage('Please generate a timetable first before reviewing.')
+      setReviewOk(false)
+      setConflicts([])
+      setReviewData(null)
+      return
+    }
+    
     try {
+      // Get faculty map to convert names to IDs
+      const facultyMap = Object.fromEntries(faculty.map(f => [f.name, f.faculty_id]))
+      
+      // Prepare new entries for review
+      const newEntries = result.map(entry => ({
+        subject_name: entry.subject_name || entry.subject,
+        faculty_name: entry.faculty_name || entry.faculty,
+        room_name: entry.room_name || entry.room,
+        day_of_week: entry.day_of_week,
+        timeslot_id: entry.timeslot_id
+      }))
+      
       const review = await post('/timetable/review', {
         academic_year: form.academic_year,
         program_id: Number(form.program_id),
-        batch_id: Number(form.batch_id)
+        batch_id: Number(form.batch_id),
+        new_entries: newEntries
       })
-      setReviewOk(true)
-      setMessage('Review OK: no conflicts detected in existing timetable scope.')
+      
+      setReviewData(review)
+      setConflicts(review.conflicts || [])
+      
+      if (review.ok && review.conflictsCount === 0) {
+        setReviewOk(true)
+        setMessage('✅ Timetable is correct! No conflicts detected with existing timetables.')
+      } else {
+        setReviewOk(false)
+        setMessage(`⚠️ ${review.conflictsCount || 0} conflict(s) detected. Please review the details below.`)
+      }
     } catch (e) {
       setReviewOk(false)
+      setConflicts([])
+      setReviewData(null)
       setMessage(e.message || 'Review failed')
     }
   }
@@ -153,14 +216,66 @@ export default function GenerateTimetable() {
     <div className="grid">
       <div className="card">
         <h3 style={{ marginTop: 0 }}>Generate Timetable</h3>
-        {message && <div style={{ color: '#6b7280' }}>{message}</div>}
+        {message && (
+          <div style={{ 
+            padding: '12px 16px', 
+            borderRadius: '8px',
+            marginBottom: '16px',
+            background: reviewOk ? '#d1fae5' : message.includes('⚠️') ? '#fef3c7' : '#fee2e2',
+            color: reviewOk ? '#065f46' : message.includes('⚠️') ? '#92400e' : '#991b1b',
+            border: `1px solid ${reviewOk ? '#10b981' : message.includes('⚠️') ? '#f59e0b' : '#ef4444'}`
+          }}>
+            {message}
+          </div>
+        )}
+        {conflicts.length > 0 && (
+          <div style={{ 
+            padding: '16px', 
+            borderRadius: '8px',
+            marginBottom: '16px',
+            background: '#fee2e2',
+            border: '1px solid #ef4444'
+          }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '12px', color: '#991b1b', fontSize: '16px' }}>
+              ⚠️ Conflicts Detected ({conflicts.length}):
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {conflicts.map((conflict, idx) => (
+                <div key={idx} style={{ 
+                  padding: '12px', 
+                  background: 'white', 
+                  borderRadius: '6px',
+                  border: '1px solid #fca5a5'
+                }}>
+                  <div style={{ fontWeight: '600', marginBottom: '8px', color: '#991b1b' }}>
+                    {conflict.type === 'faculty_conflict' ? '👤 Faculty Conflict' : '🏢 Room Conflict'}
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#7f1d1d', marginBottom: '6px' }}>
+                    <strong>New Entry:</strong> {conflict.new_entry.subject} by {conflict.new_entry.faculty} 
+                    on {conflict.new_entry.day} at slot {conflict.new_entry.timeslot_id}
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#7f1d1d' }}>
+                    <strong>Conflicts With:</strong> {conflict.existing_entry.subject} by {conflict.existing_entry.faculty}
+                    {conflict.existing_entry.room && ` in ${conflict.existing_entry.room}`}
+                    {' '}on {conflict.existing_entry.day} at slot {conflict.existing_entry.timeslot_id}
+                    {' '}(Academic Year: {conflict.existing_entry.academic_year}, 
+                    Program: {conflict.existing_entry.program_id}, Batch: {conflict.existing_entry.batch_id})
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <form className="form" onSubmit={onSubmit}>
           <div className="form-row inline">
             <FormInput label="Department" name="department_id" type="select" value={form.department_id} onChange={onChange} options={departments} required />
             <FormInput label="Program" name="program_id" type="select" value={form.program_id} onChange={onChange} options={programs} required />
           </div>
           <div className="form-row inline">
+            <FormInput label="Semester" name="semester_id" type="select" value={form.semester_id} onChange={onChange} options={semesters} required disabled={!form.program_id} />
             <FormInput label="Batch" name="batch_id" type="select" value={form.batch_id} onChange={onChange} options={batches} required />
+          </div>
+          <div className="form-row inline">
             <FormInput label="Academic Year" name="academic_year" type="select" value={form.academic_year} onChange={onChange} options={academicTerms} required />
           </div>
           <div className="form-row">
@@ -172,9 +287,33 @@ export default function GenerateTimetable() {
           <div className="form-row">
             <label><input type="checkbox" name="persist" checked={!!form.persist} onChange={onChange} /> Save to TimetableEntries</label>
           </div>
+          {!form.semester_id && form.program_id && (
+            <div style={{ 
+              margin: '12px 0', 
+              padding: '12px', 
+              background: '#fef3c7', 
+              border: '1px solid #f59e0b',
+              borderRadius: '8px',
+              color: '#92400e'
+            }}>
+              ⚠️ Please select a Semester to see subjects for that semester.
+            </div>
+          )}
+          {form.semester_id && subjects.length === 0 && (
+            <div style={{ 
+              margin: '12px 0', 
+              padding: '12px', 
+              background: '#fee2e2', 
+              border: '1px solid #ef4444',
+              borderRadius: '8px',
+              color: '#991b1b'
+            }}>
+              ℹ️ No subjects found for the selected semester. Please add subjects to this semester first.
+            </div>
+          )}
           {subjects.length > 0 && (
             <div style={{ margin: '12px 0' }}>
-              <h4>Assignments per Subject</h4>
+              <h4>Assignments per Subject ({subjects.length} subjects)</h4>
               <table>
                 <thead>
                   <tr><th>Subject</th><th>Type</th><th>Faculty</th><th>Block Hours</th></tr>

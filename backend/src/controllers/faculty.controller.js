@@ -1,4 +1,18 @@
 import { FacultyAvailability, TimetableEntry, Faculty } from '../models/index.js'
+import { sequelize } from '../config/db.js'
+
+// Helper function to reset AUTO_INCREMENT after deletion
+async function resetAutoIncrement(model, pkName = null) {
+  try {
+    const pk = pkName || Object.keys(model.primaryKeys)[0]
+    const tableName = model.getTableName()
+    const [rows] = await sequelize.query(`SELECT COALESCE(MAX(\`${pk}\`), 0) + 1 AS next_id FROM \`${tableName}\``)
+    const nextId = rows && rows[0] ? rows[0].next_id : 1
+    await sequelize.query(`ALTER TABLE \`${tableName}\` AUTO_INCREMENT = ${Number(nextId)}`)
+  } catch (error) {
+    console.error(`Failed to reset AUTO_INCREMENT for ${model.getTableName()}:`, error.message)
+  }
+}
 
 export const getTimetable = async (req, res, next) => {
   try { 
@@ -36,6 +50,7 @@ export const updateAvailability = async (req, res, next) => {
   try {
     const { faculty_id } = req.params
     await FacultyAvailability.destroy({ where: { faculty_id } })
+    await resetAutoIncrement(FacultyAvailability)
     if (Array.isArray(req.body)) {
       await FacultyAvailability.bulkCreate(req.body.map(x => ({ ...x, faculty_id })))
     }

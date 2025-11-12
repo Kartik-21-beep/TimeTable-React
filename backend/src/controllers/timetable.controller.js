@@ -250,13 +250,141 @@ export const today = async (req, res, next) => {
 // Review conflicts against existing timetable entries for a given scope
 export const review = async (req, res, next) => {
   try {
-    const { academic_year, program_id, batch_id } = req.body || {}
+    const { academic_year, program_id, batch_id, new_entries } = req.body || {}
     if (!academic_year || !program_id || !batch_id) return res.status(400).json({ error: 'academic_year, program_id, batch_id are required' })
-    const existing = await TimetableEntry.findAll({ where: { academic_year, program_id, batch_id } })
-    // Build fast lookup
-    const facultyKeys = new Set(existing.map(r => `${r.faculty_id}-${r.day_of_week}-${r.timeslot_id}`))
-    const roomKeys = new Set(existing.map(r => `${r.room_id}-${r.day_of_week}-${r.timeslot_id}`))
-    res.json({ ok: true, totals: { rows: existing.length, facultySlots: facultyKeys.size, roomSlots: roomKeys.size } })
+    
+    // Get ALL existing timetable entries (not just same scope) to check for conflicts
+    const allExisting = await TimetableEntry.findAll({
+      include: [
+        { model: Subject, attributes: ['name', 'subject_code'] },
+        { model: Faculty, attributes: ['name'] },
+        { model: Classroom, attributes: ['name'] }
+      ]
+    })
+    
+    // Build lookup maps for conflicts
+    const facultySlots = new Map() // key: faculty_id-day-timeslot -> entry details
+    const roomSlots = new Map()    // key: room_id-day-timeslot -> entry details
+    
+    for (const entry of allExisting) {
+      const facultyKey = `${entry.faculty_id}-${entry.day_of_week}-${entry.timeslot_id}`
+      const roomKey = `${entry.room_id}-${entry.day_of_week}-${entry.timeslot_id}`
+      
+      if (!facultySlots.has(facultyKey)) {
+        facultySlots.set(facultyKey, [])
+      }
+      facultySlots.get(facultyKey).push({
+        academic_year: entry.academic_year,
+        program_id: entry.program_id,
+        batch_id: entry.batch_id,
+        subject_name: entry.Subject?.name || `Subject #${entry.subject_id}`,
+        faculty_name: entry.Faculty?.name || `Faculty #${entry.faculty_id}`,
+        room_name: entry.Classroom?.name || `Room #${entry.room_id}`,
+        day: entry.day_of_week,
+        timeslot_id: entry.timeslot_id
+      })
+      
+      if (!roomSlots.has(roomKey)) {
+        roomSlots.set(roomKey, [])
+      }
+      roomSlots.get(roomKey).push({
+        academic_year: entry.academic_year,
+        program_id: entry.program_id,
+        batch_id: entry.batch_id,
+        subject_name: entry.Subject?.name || `Subject #${entry.subject_id}`,
+        faculty_name: entry.Faculty?.name || `Faculty #${entry.faculty_id}`,
+        room_name: entry.Classroom?.name || `Room #${entry.room_id}`,
+        day: entry.day_of_week,
+        timeslot_id: entry.timeslot_id
+      })
+    }
+    
+    // Check conflicts with new entries if provided
+    const conflicts = []
+    if (new_entries && Array.isArray(new_entries) && new_entries.length > 0) {
+      // Get faculty map to convert names to IDs
+      const facultyList = await Faculty.findAll({ attributes: ['faculty_id', 'name'] })
+      const facultyMap = Object.fromEntries(facultyList.map(f => [f.name, f.faculty_id]))
+      
+      for (const newEntry of new_entries) {
+        const facultyId = facultyMap[newEntry.faculty_name]
+        if (facultyId) {
+          const facultyKey = `${facultyId}-${newEntry.day_of_week}-${newEntry.timeslot_id}`
+          if (facultySlots.has(facultyKey)) {
+            const existingEntries = facultySlots.get(facultyKey)
+            for (const existing of existingEntries) {
+              conflicts.push({
+                type: 'faculty_conflict',
+                message: `Faculty "${newEntry.faculty_name}" is already scheduled`,
+                new_entry: {
+                  subject: newEntry.subject_name,
+                  faculty: newEntry.faculty_name,
+                  day: newEntry.day_of_week,
+                  timeslot_id: newEntry.timeslot_id
+                },
+                existing_entry: {
+                  subject: existing.subject_name,
+                  faculty: existing.faculty_name,
+                  room: existing.room_name,
+                  day: existing.day,
+                  timeslot_id: existing.timeslot_id,
+                  academic_year: existing.academic_year,
+                  program_id: existing.program_id,
+                  batch_id: existing.batch_id
+                }
+              })
+            }
+          }
+        }
+        
+        // Check room conflicts if room_name is provided
+        if (newEntry.room_name && newEntry.room_name !== 'Unknown Room') {
+          const rooms = await Classroom.findAll({ attributes: ['room_id', 'name'] })
+          const roomMap = Object.fromEntries(rooms.map(r => [r.name, r.room_id]))
+          const roomId = roomMap[newEntry.room_name]
+          if (roomId) {
+            const roomKey = `${roomId}-${newEntry.day_of_week}-${newEntry.timeslot_id}`
+            if (roomSlots.has(roomKey)) {
+              const existingEntries = roomSlots.get(roomKey)
+              for (const existing of existingEntries) {
+                conflicts.push({
+                  type: 'room_conflict',
+                  message: `Room "${newEntry.room_name}" is already booked`,
+                  new_entry: {
+                    subject: newEntry.subject_name,
+                    faculty: newEntry.faculty_name,
+                    room: newEntry.room_name,
+                    day: newEntry.day_of_week,
+                    timeslot_id: newEntry.timeslot_id
+                  },
+                  existing_entry: {
+                    subject: existing.subject_name,
+                    faculty: existing.faculty_name,
+                    room: existing.room_name,
+                    day: existing.day,
+                    timeslot_id: existing.timeslot_id,
+                    academic_year: existing.academic_year,
+                    program_id: existing.program_id,
+                    batch_id: existing.batch_id
+                  }
+                })
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    res.json({ 
+      ok: conflicts.length === 0, 
+      conflicts: conflicts,
+      conflictsCount: conflicts.length,
+      totals: { 
+        existingEntries: allExisting.length,
+        facultySlots: facultySlots.size,
+        roomSlots: roomSlots.size
+      }
+    })
   } catch (e) { next(e) }
 }
 
