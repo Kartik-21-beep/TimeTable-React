@@ -56,10 +56,26 @@ export default function Signup() {
   }
 
   return (
-    <div className="content">
-      <div className="card" style={{ maxWidth: 480, margin: '40px auto' }}>
-        <h2 style={{ marginTop: 0 }}>Sign up</h2>
-        {error && <div style={{ color: 'crimson' }}>{error}</div>}
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '20px'
+    }}>
+      <div className="card" style={{ maxWidth: 480, width: '100%' }}>
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '8px' }}>✨</div>
+          <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 700 }}>Create Account</h2>
+          <p style={{ margin: '8px 0 0', color: 'var(--muted)', fontSize: '14px' }}>Sign up to get started</p>
+        </div>
+        {error && (
+          <div className="message error" style={{ marginBottom: '16px' }}>
+            <span>⚠️</span>
+            <span>{error}</span>
+          </div>
+        )}
         <form className="form" onSubmit={onSubmit}>
           <FormInput label="Email" name="email" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} required />
           <FormInput label="Password" name="password" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} required />
@@ -86,10 +102,15 @@ export default function Signup() {
               placeholder="Select Batch"
             />
           )}
-          <button className="btn" type="submit" disabled={loading}>
+          <button className="btn" type="submit" disabled={loading} style={{ width: '100%', marginTop: '8px' }}>
             {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
+        <div style={{ marginTop: 20, textAlign: 'center' }}>
+          <p style={{ margin: 0, color: 'var(--muted)', fontSize: '14px' }}>
+            Already have an account? <a href="/login" style={{ color: 'var(--primary)', fontWeight: 500 }}>Login</a>
+          </p>
+        </div>
       </div>
     </div>
   )

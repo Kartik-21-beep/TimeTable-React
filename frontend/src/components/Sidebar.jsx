@@ -1,51 +1,81 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function Sidebar({ role }) {
+  const location = useLocation()
+  
+  const isActive = (path) => {
+    if (path === '/admin/dashboard' || path === '/faculty/dashboard' || path === '/student/dashboard') {
+      return location.pathname === path
+    }
+    return location.pathname.startsWith(path)
+  }
+  
+  const NavLink = ({ to, children, icon }) => (
+    <Link 
+      className={`nav-link ${isActive(to) ? 'active' : ''}`} 
+      to={to}
+    >
+      {icon && <span style={{ marginRight: '8px', fontSize: '16px' }}>{icon}</span>}
+      {children}
+    </Link>
+  )
+  
   return (
     <aside className="sidebar">
       {!role && (
         <div className="nav-section">
           <div className="nav-title">Auth</div>
-          <Link className="nav-link" to="/login">Login</Link>
-          <Link className="nav-link" to="/signup">Signup</Link>
+          <NavLink to="/login" icon="🔐">Login</NavLink>
+          <NavLink to="/signup" icon="✍️">Signup</NavLink>
         </div>
       )}
       {role === 'Admin' && (
-        <div className="nav-section">
-          <div className="nav-title">Admin</div>
-          <Link className="nav-link" to="/admin/dashboard">Dashboard</Link>
-          <Link className="nav-link" to="/admin/departments">Departments</Link>
-          <Link className="nav-link" to="/admin/programs">Programs</Link>
-          <Link className="nav-link" to="/admin/batches">Batches</Link>
-          <Link className="nav-link" to="/admin/semesters">Semesters</Link>
-          <Link className="nav-link" to="/admin/subjects">Subjects</Link>
-          <Link className="nav-link" to="/admin/faculty">Faculty</Link>
-          <Link className="nav-link" to="/admin/classrooms">Classrooms</Link>
-          <Link className="nav-link" to="/admin/elective-groups">Elective Groups</Link>
-          <Link className="nav-link" to="/admin/elective-subjects">Elective Subjects</Link>
-          <Link className="nav-link" to="/admin/batch-electives">Batch Elective Choice</Link>
-          <Link className="nav-link" to="/admin/department-constraints">Department Constraints</Link>
-          <Link className="nav-link" to="/admin/time-slots">Time Slots</Link>
-          <Link className="nav-link" to="/admin/academic-terms">Academic Terms</Link>
-          <Link className="nav-link" to="/admin/clear-timetable">Clear Timetable</Link>
-          <Link className="nav-link" to="/admin/generate">Generate Timetable</Link>
-          <Link className="nav-link" to="/admin/logs">Generation Logs</Link>
-        </div>
+        <>
+          <div className="nav-section">
+            <div className="nav-title">Main</div>
+            <NavLink to="/admin/dashboard" icon="📊">Dashboard</NavLink>
+          </div>
+          <div className="nav-section">
+            <div className="nav-title">Management</div>
+            <NavLink to="/admin/departments" icon="🏢">Departments</NavLink>
+            <NavLink to="/admin/programs" icon="📚">Programs</NavLink>
+            <NavLink to="/admin/batches" icon="👥">Batches</NavLink>
+            <NavLink to="/admin/semesters" icon="📅">Semesters</NavLink>
+            <NavLink to="/admin/subjects" icon="📖">Subjects</NavLink>
+            <NavLink to="/admin/faculty" icon="👨‍🏫">Faculty</NavLink>
+            <NavLink to="/admin/classrooms" icon="🏫">Classrooms</NavLink>
+          </div>
+          <div className="nav-section">
+            <div className="nav-title">Electives</div>
+            <NavLink to="/admin/elective-groups" icon="📋">Elective Groups</NavLink>
+            <NavLink to="/admin/elective-subjects" icon="📝">Elective Subjects</NavLink>
+            <NavLink to="/admin/batch-electives" icon="✅">Batch Elective Choice</NavLink>
+          </div>
+          <div className="nav-section">
+            <div className="nav-title">Timetable</div>
+            <NavLink to="/admin/time-slots" icon="⏰">Time Slots</NavLink>
+            <NavLink to="/admin/academic-terms" icon="📆">Academic Terms</NavLink>
+            <NavLink to="/admin/department-constraints" icon="⚙️">Department Constraints</NavLink>
+            <NavLink to="/admin/generate" icon="⚡">Generate Timetable</NavLink>
+            <NavLink to="/admin/clear-timetable" icon="🗑️">Clear Timetable</NavLink>
+            <NavLink to="/admin/logs" icon="📜">Generation Logs</NavLink>
+          </div>
+        </>
       )}
       {role === 'Faculty' && (
         <div className="nav-section">
           <div className="nav-title">Faculty</div>
-          <Link className="nav-link" to="/faculty/dashboard">Dashboard</Link>
-          <Link className="nav-link" to="/faculty/timetable">My Timetable</Link>
-          <Link className="nav-link" to="/faculty/availability">Manage Availability</Link>
+          <NavLink to="/faculty/dashboard" icon="📊">Dashboard</NavLink>
+          <NavLink to="/faculty/timetable" icon="📅">My Timetable</NavLink>
+          <NavLink to="/faculty/availability" icon="⏰">Manage Availability</NavLink>
         </div>
       )}
       {role === 'Viewer' && (
         <div className="nav-section">
           <div className="nav-title">Student</div>
-          <Link className="nav-link" to="/student/dashboard">Dashboard</Link>
-          <Link className="nav-link" to="/student/timetable">My Timetable</Link>
-          <Link className="nav-link" to="/student/choose-electives">Choose Electives</Link>
+          <NavLink to="/student/dashboard" icon="📊">Dashboard</NavLink>
+          <NavLink to="/student/timetable" icon="📅">My Timetable</NavLink>
+          <NavLink to="/student/choose-electives" icon="📝">Choose Electives</NavLink>
         </div>
       )}
     </aside>
