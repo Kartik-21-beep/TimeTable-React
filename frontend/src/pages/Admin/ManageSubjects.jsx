@@ -49,7 +49,16 @@ export default function ManageSubjects() {
           <FormInput label="Type" name="type" type="select" value={form.type} onChange={onChange} options={[ 'Lecture','Tutorial','Practical','Studio' ].map(v=>({ value:v, label:v }))} />
           <FormInput label="Weekly Hours" name="weekly_hours" type="number" min={0} max={30} value={form.weekly_hours} onChange={onChange} />
           <div className="form-row">
-            <label><input type="checkbox" name="is_elective" checked={!!form.is_elective} onChange={onChange} /> Is Elective</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="is_elective" 
+                checked={!!form.is_elective} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Is Elective</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.subject_id ? 'Update' : 'Create'}</button>
@@ -57,30 +66,41 @@ export default function ManageSubjects() {
           </div>
         </form>
       </div>
-      <div className="card">
+      <div className="card" style={{ overflow: 'hidden' }}>
         <h3 style={{ marginTop: 0 }}>Subjects</h3>
-        <table>
-          <thead>
-            <tr><th>ID</th><th>Semester</th><th>Code</th><th>Name</th><th>Type</th><th>Hrs</th><th>Elective</th><th></th></tr>
-          </thead>
-          <tbody>
-            {items.map(row => (
-              <tr key={row.subject_id}>
-                <td>{row.subject_id}</td>
-                <td>{row.semester_id}</td>
-                <td>{row.subject_code}</td>
-                <td>{row.name}</td>
-                <td>{row.type}</td>
-                <td>{row.weekly_hours}</td>
-                <td>{row.is_elective ? 'Yes' : 'No'}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
-                  <button className="btn secondary" onClick={()=>onDelete(row.subject_id)}>Delete</button>
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table style={{ minWidth: '800px', width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ minWidth: '50px' }}>ID</th>
+                <th style={{ minWidth: '80px' }}>Semester</th>
+                <th style={{ minWidth: '100px' }}>Code</th>
+                <th style={{ minWidth: '180px' }}>Name</th>
+                <th style={{ minWidth: '90px' }}>Type</th>
+                <th style={{ minWidth: '60px' }}>Hrs</th>
+                <th style={{ minWidth: '80px' }}>Elective</th>
+                <th style={{ minWidth: '150px', textAlign: 'right' }}></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map(row => (
+                <tr key={row.subject_id}>
+                  <td>{row.subject_id}</td>
+                  <td>{row.semester_id}</td>
+                  <td>{row.subject_code}</td>
+                  <td>{row.name}</td>
+                  <td>{row.type}</td>
+                  <td>{row.weekly_hours}</td>
+                  <td>{row.is_elective ? 'Yes' : 'No'}</td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    <button className="btn ghost" onClick={()=>onEdit(row)} style={{ marginRight: '8px' }}>Edit</button>
+                    <button className="btn secondary" onClick={()=>onDelete(row.subject_id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )

@@ -435,4 +435,29 @@ tbody tr:last-child td {
   border: 1px solid #3b82f6;
 }
 
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* Searchable Select Dropdown Styles */
+.searchable-select-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.searchable-select-dropdown::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+.searchable-select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.searchable-select-dropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
 

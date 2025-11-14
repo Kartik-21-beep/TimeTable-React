@@ -46,10 +46,28 @@ export default function ManageSemesters() {
           <FormInput label="Program" name="program_id" type="select" value={form.program_id} onChange={onChange} options={programs} required />
           <FormInput label="Semester Number" name="semester_number" type="number" min={1} max={12} value={form.semester_number} onChange={onChange} required />
           <div className="form-row">
-            <label><input type="checkbox" name="is_final" checked={!!form.is_final} onChange={onChange} /> Is Final</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="is_final" 
+                checked={!!form.is_final} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Is Final</span>
+            </div>
           </div>
           <div className="form-row">
-            <label><input type="checkbox" name="generate_timetable" checked={!!form.generate_timetable} onChange={onChange} /> Generate Timetable</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="generate_timetable" 
+                checked={!!form.generate_timetable} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Generate Timetable</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.semester_id ? 'Update' : 'Create'}</button>

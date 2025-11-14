@@ -55,8 +55,8 @@ export default function ManageDepartments() {
                 <td>{row.department_id}</td>
                 <td>{row.code}</td>
                 <td>{row.name}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <button className="btn ghost" onClick={()=>onEdit(row)} style={{ marginRight: '8px' }}>Edit</button>
                   <button className="btn secondary" onClick={()=>onDelete(row.department_id)}>Delete</button>
                 </td>
               </tr>

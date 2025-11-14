@@ -48,7 +48,16 @@ export default function ManagePrograms() {
           <FormInput label="Name" name="name" value={form.name} onChange={onChange} required placeholder="Master of Computer Applications" />
           <FormInput label="Duration (years)" name="duration_years" type="number" min={1} max={6} value={form.duration_years} onChange={onChange} required />
           <div className="form-row">
-            <label><input type="checkbox" name="active" checked={!!form.active} onChange={onChange} /> Active</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="active" 
+                checked={!!form.active} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Active</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.program_id ? 'Update' : 'Create'}</button>
@@ -56,29 +65,39 @@ export default function ManagePrograms() {
           </div>
         </form>
       </div>
-      <div className="card">
+      <div className="card" style={{ overflow: 'hidden' }}>
         <h3 style={{ marginTop: 0 }}>Programs</h3>
-        <table>
-          <thead>
-            <tr><th>ID</th><th>Department</th><th>Code</th><th>Name</th><th>Duration</th><th>Active</th><th></th></tr>
-          </thead>
-          <tbody>
-            {items.map(row => (
-              <tr key={row.program_id}>
-                <td>{row.program_id}</td>
-                <td>{row.department_id}</td>
-                <td>{row.code}</td>
-                <td>{row.name}</td>
-                <td>{row.duration_years}</td>
-                <td>{row.active ? 'Yes' : 'No'}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
-                  <button className="btn secondary" onClick={()=>onDelete(row.program_id)}>Delete</button>
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table style={{ minWidth: '700px', width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ minWidth: '50px' }}>ID</th>
+                <th style={{ minWidth: '100px' }}>Department</th>
+                <th style={{ minWidth: '80px' }}>Code</th>
+                <th style={{ minWidth: '150px' }}>Name</th>
+                <th style={{ minWidth: '80px' }}>Duration</th>
+                <th style={{ minWidth: '70px' }}>Active</th>
+                <th style={{ minWidth: '150px', textAlign: 'right' }}></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map(row => (
+                <tr key={row.program_id}>
+                  <td>{row.program_id}</td>
+                  <td>{row.department_id}</td>
+                  <td>{row.code}</td>
+                  <td>{row.name}</td>
+                  <td>{row.duration_years}</td>
+                  <td>{row.active ? 'Yes' : 'No'}</td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    <button className="btn ghost" onClick={()=>onEdit(row)} style={{ marginRight: '8px' }}>Edit</button>
+                    <button className="btn secondary" onClick={()=>onDelete(row.program_id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )

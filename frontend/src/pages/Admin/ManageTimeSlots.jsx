@@ -39,7 +39,7 @@ export default function ManageTimeSlots() {
             <FormInput label="Start Time" name="start_time" type="time" value={form.start_time} onChange={onChange} required />
             <FormInput label="End Time" name="end_time" type="time" value={form.end_time} onChange={onChange} required />
           </div>
-          <FormInput label="Label" name="label" value={form.label} onChange={onChange} placeholder="09:00-10:00" />
+          <FormInput label="Label" name="label" value={form.label} onChange={onChange} placeholder="First Lecture" />
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.timeslot_id ? 'Update' : 'Create'}</button>
             {form.timeslot_id && <button className="btn ghost" type="button" onClick={reset}>Cancel</button>}

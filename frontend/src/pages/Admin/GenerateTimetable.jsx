@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { get, post } from '../../api/apiClient'
 import FormInput from '../../components/FormInput'
+import SearchableSelect from '../../components/SearchableSelect'
 import TimetableTable from '../../components/TimetableTable'
 
 export default function GenerateTimetable() {
@@ -279,13 +280,40 @@ export default function GenerateTimetable() {
             <FormInput label="Academic Year" name="academic_year" type="select" value={form.academic_year} onChange={onChange} options={academicTerms} required />
           </div>
           <div className="form-row">
-            <label><input type="checkbox" name="respect_lunch" checked={!!form.respect_lunch} onChange={onChange} /> Respect lunch</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="respect_lunch" 
+                checked={!!form.respect_lunch} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Respect lunch</span>
+            </div>
           </div>
           <div className="form-row">
-            <label><input type="checkbox" name="no_weekends" checked={!!form.no_weekends} onChange={onChange} /> No weekends</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="no_weekends" 
+                checked={!!form.no_weekends} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>No weekends</span>
+            </div>
           </div>
           <div className="form-row">
-            <label><input type="checkbox" name="persist" checked={!!form.persist} onChange={onChange} /> Save to TimetableEntries</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="persist" 
+                checked={!!form.persist} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Save to TimetableEntries</span>
+            </div>
           </div>
           {!form.semester_id && form.program_id && (
             <div style={{ 
@@ -326,10 +354,12 @@ export default function GenerateTimetable() {
                         <td>{s.subject_code} — {s.name}</td>
                         <td>{s.type}</td>
                         <td>
-                          <select value={a.faculty_id} onChange={(e)=>setAssignments(assignments.map(x=>x.subject_id===s.subject_id?{...a, faculty_id: e.target.value}:x))}>
-                            <option value="">Select faculty</option>
-                            {faculty.map(f => <option key={f.faculty_id} value={f.faculty_id}>{f.name}</option>)}
-                          </select>
+                          <SearchableSelect
+                            value={a.faculty_id || ''}
+                            onChange={(e)=>setAssignments(assignments.map(x=>x.subject_id===s.subject_id?{...a, faculty_id: e.target.value}:x))}
+                            options={[{ value: '', label: 'Select faculty' }, ...faculty.map(f => ({ value: f.faculty_id, label: f.name }))]}
+                            placeholder="Select faculty"
+                          />
                         </td>
                         <td>
                           <input type="number" min={1} max={4} value={a.block_hours}

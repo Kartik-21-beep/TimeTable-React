@@ -96,7 +96,16 @@ export default function ManageDepartmentConstraints() {
             <FormInput label="Slot Duration (min)" name="slot_duration_minutes" type="number" min={30} max={120} value={form.slot_duration_minutes} onChange={onChange} />
           </div>
           <div className="form-row">
-            <label><input type="checkbox" name="no_weekends" checked={!!form.no_weekends} onChange={onChange} /> No Weekends</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="no_weekends" 
+                checked={!!form.no_weekends} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>No Weekends</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.id ? 'Update' : 'Create'}</button>
@@ -104,30 +113,41 @@ export default function ManageDepartmentConstraints() {
           </div>
         </form>
       </div>
-      <div className="card">
+      <div className="card" style={{ overflow: 'hidden' }}>
         <h3 style={{ marginTop: 0 }}>Department Constraints</h3>
-        <table>
-          <thead>
-            <tr><th>ID</th><th>Department</th><th>Working Hours</th><th>Lunch</th><th>Max/Day</th><th>Slot</th><th>Weekends</th><th></th></tr>
-          </thead>
-          <tbody>
-            {items.map(row => (
-              <tr key={row.id}>
-                <td>{row.id}</td>
-                <td>{row.department_id}</td>
-                <td>{row.working_start} - {row.working_end}</td>
-                <td>{row.lunch_start} - {row.lunch_end}</td>
-                <td>{row.max_classes_per_day}</td>
-                <td>{row.slot_duration_minutes}min</td>
-                <td>{row.no_weekends ? 'No' : 'Yes'}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
-                  <button className="btn secondary" onClick={()=>onDelete(row.id)}>Delete</button>
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table style={{ minWidth: '800px', width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ minWidth: '50px' }}>ID</th>
+                <th style={{ minWidth: '100px' }}>Department</th>
+                <th style={{ minWidth: '140px' }}>Working Hours</th>
+                <th style={{ minWidth: '120px' }}>Lunch</th>
+                <th style={{ minWidth: '80px' }}>Max/Day</th>
+                <th style={{ minWidth: '70px' }}>Slot</th>
+                <th style={{ minWidth: '80px' }}>Weekends</th>
+                <th style={{ minWidth: '150px', textAlign: 'right' }}></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map(row => (
+                <tr key={row.id}>
+                  <td>{row.id}</td>
+                  <td>{row.department_id}</td>
+                  <td>{row.working_start} - {row.working_end}</td>
+                  <td>{row.lunch_start} - {row.lunch_end}</td>
+                  <td>{row.max_classes_per_day}</td>
+                  <td>{row.slot_duration_minutes}min</td>
+                  <td>{row.no_weekends ? 'No' : 'Yes'}</td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
+                    <button className="btn secondary" onClick={()=>onDelete(row.id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )

@@ -81,7 +81,16 @@ export default function ManageAcademicTerms() {
             <FormInput label="End Date" name="end_date" type="date" value={form.end_date} onChange={onChange} required />
           </div>
           <div className="form-row">
-            <label><input type="checkbox" name="is_active" checked={!!form.is_active} onChange={onChange} /> Active Term</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="is_active" 
+                checked={!!form.is_active} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Active Term</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.term_id ? 'Update' : 'Create'}</button>
@@ -97,15 +106,15 @@ export default function ManageAcademicTerms() {
           </thead>
           <tbody>
             {items.map(row => (
-              <tr key={row.term_id} style={{ backgroundColor: row.is_active ? '#f0f9ff' : 'transparent' }}>
+              <tr key={row.term_id}>
                 <td>{row.term_id}</td>
                 <td>{row.academic_year}</td>
                 <td>{row.term_type}</td>
                 <td>{row.start_date}</td>
                 <td>{row.end_date}</td>
                 <td>{row.is_active ? '✓' : '✗'}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <button className="btn ghost" onClick={()=>onEdit(row)} style={{ marginRight: '8px' }}>Edit</button>
                   <button className="btn secondary" onClick={()=>onDelete(row.term_id)}>Delete</button>
                 </td>
               </tr>

@@ -54,7 +54,16 @@ export default function ManageFaculty() {
           <FormInput label="Primary Department" name="primary_department_id" type="select" value={form.primary_department_id} onChange={onChange} options={departments} />
           <FormInput label="Max Load / week" name="max_load_per_week" type="number" min={0} max={40} value={form.max_load_per_week} onChange={onChange} />
           <div className="form-row">
-            <label><input type="checkbox" name="is_active" checked={!!form.is_active} onChange={onChange} /> Active</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                name="is_active" 
+                checked={!!form.is_active} 
+                onChange={onChange}
+                style={{ cursor: 'pointer' }}
+              />
+              <span style={{ cursor: 'default', userSelect: 'none' }}>Active</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn" type="submit">{form.faculty_id ? 'Update' : 'Create'}</button>
@@ -62,51 +71,67 @@ export default function ManageFaculty() {
           </div>
         </form>
       </div>
-      <div className="card">
+      <div className="card" style={{ overflow: 'hidden' }}>
         <h3 style={{ marginTop: 0 }}>Faculty</h3>
-        <table>
-          <thead>
-            <tr><th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Max Load</th><th>Active</th><th></th></tr>
-          </thead>
-          <tbody>
-            {items.map(row => (
-              <tr key={row.faculty_id}>
-                <td>{row.faculty_id}</td>
-                <td>{row.name}</td>
-                <td>{row.email}</td>
-                <td>{row.primary_department_id}</td>
-                <td>{row.max_load_per_week}</td>
-                <td>{row.is_active ? 'Yes' : 'No'}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn ghost" onClick={()=>onEdit(row)}>Edit</button>{' '}
-                  <button className="btn secondary" onClick={()=>onDelete(row.faculty_id)}>Delete</button>
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table style={{ minWidth: '700px', width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ minWidth: '50px' }}>ID</th>
+                <th style={{ minWidth: '150px' }}>Name</th>
+                <th style={{ minWidth: '180px' }}>Email</th>
+                <th style={{ minWidth: '80px' }}>Dept</th>
+                <th style={{ minWidth: '90px' }}>Max Load</th>
+                <th style={{ minWidth: '70px' }}>Active</th>
+                <th style={{ minWidth: '150px', textAlign: 'right' }}></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map(row => (
+                <tr key={row.faculty_id}>
+                  <td>{row.faculty_id}</td>
+                  <td>{row.name}</td>
+                  <td>{row.email || '-'}</td>
+                  <td>{row.primary_department_id || '-'}</td>
+                  <td>{row.max_load_per_week}</td>
+                  <td>{row.is_active ? 'Yes' : 'No'}</td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                    <button className="btn ghost" onClick={()=>onEdit(row)} style={{ marginRight: '8px' }}>Edit</button>
+                    <button className="btn secondary" onClick={()=>onDelete(row.faculty_id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ overflow: 'hidden' }}>
         <h3 style={{ marginTop: 0 }}>Who teaches what</h3>
-        <table>
-          <thead>
-            <tr><th>Faculty</th><th>Email</th><th>Subjects</th></tr>
-          </thead>
-          <tbody>
-            {teaching.map(row => (
-              <tr key={row.faculty.faculty_id}>
-                <td>{row.faculty.name}</td>
-                <td>{row.faculty.email || '-'}</td>
-                <td>
-                  {row.subjects && row.subjects.length > 0 ? row.subjects.map(s => (
-                    <span key={s.subject_id} className="chip">{s.subject_code} — {s.name}</span>
-                  )) : '—'}
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table style={{ minWidth: '600px', width: '100%' }}>
+            <thead>
+              <tr>
+                <th style={{ minWidth: '150px' }}>Faculty</th>
+                <th style={{ minWidth: '180px' }}>Email</th>
+                <th style={{ minWidth: '300px' }}>Subjects</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {teaching.map(row => (
+                <tr key={row.faculty.faculty_id}>
+                  <td>{row.faculty.name}</td>
+                  <td>{row.faculty.email || '-'}</td>
+                  <td>
+                    {row.subjects && row.subjects.length > 0 ? row.subjects.map(s => (
+                      <span key={s.subject_id} className="chip">{s.subject_code} — {s.name}</span>
+                    )) : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )
