@@ -2,14 +2,14 @@ import { DataTypes } from 'sequelize'
 import { sequelize } from '../config/db.js'
 
 // 1. Departments
-export const Department = sequelize.define('Departments', {
+export const Department = sequelize.define('departments', {
   department_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   code: { type: DataTypes.STRING(10), unique: true, allowNull: false },
   name: { type: DataTypes.STRING(150), allowNull: false }
 }, { timestamps: false })
 
 // 2. Programs
-export const Program = sequelize.define('Programs', {
+export const Program = sequelize.define('programs', {
   program_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   department_id: { type: DataTypes.INTEGER, allowNull: false },
   code: { type: DataTypes.STRING(20), allowNull: false },
@@ -19,7 +19,7 @@ export const Program = sequelize.define('Programs', {
 }, { timestamps: false })
 
 // 3. Batches
-export const Batch = sequelize.define('Batches', {
+export const Batch = sequelize.define('batches', {
   batch_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   program_id: { type: DataTypes.INTEGER, allowNull: false },
   name: { type: DataTypes.STRING(50), allowNull: false },
@@ -27,7 +27,7 @@ export const Batch = sequelize.define('Batches', {
 }, { timestamps: false })
 
 // 4. Semesters
-export const Semester = sequelize.define('Semesters', {
+export const Semester = sequelize.define('semesters', {
   semester_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   program_id: { type: DataTypes.INTEGER, allowNull: false },
   semester_number: { type: DataTypes.INTEGER, allowNull: false },
@@ -38,7 +38,7 @@ export const Semester = sequelize.define('Semesters', {
 }, { timestamps: false })
 
 // 5. Academic Terms
-export const AcademicTerm = sequelize.define('AcademicTerms', {
+export const AcademicTerm = sequelize.define('academicterms', {
   term_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   academic_year: { type: DataTypes.STRING(9), allowNull: false },
   term_type: { type: DataTypes.ENUM('Odd','Even'), allowNull: false },
@@ -48,7 +48,7 @@ export const AcademicTerm = sequelize.define('AcademicTerms', {
 }, { timestamps: false })
 
 // 6. Subjects
-export const Subject = sequelize.define('Subjects', {
+export const Subject = sequelize.define('subjects', {
   subject_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   semester_id: { type: DataTypes.INTEGER, allowNull: false },
   subject_code: { type: DataTypes.STRING(20), allowNull: false },
@@ -59,7 +59,7 @@ export const Subject = sequelize.define('Subjects', {
 }, { timestamps: false })
 
 // 7. Elective Groups
-export const ElectiveGroup = sequelize.define('ElectiveGroups', {
+export const ElectiveGroup = sequelize.define('electivegroups', {
   elective_group_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING(150), allowNull: false },
   department_id: { type: DataTypes.INTEGER },
@@ -68,14 +68,14 @@ export const ElectiveGroup = sequelize.define('ElectiveGroups', {
 }, { timestamps: false })
 
 // 8. Elective Subjects
-export const ElectiveSubject = sequelize.define('ElectiveSubjects', {
+export const ElectiveSubject = sequelize.define('electivesubjects', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   elective_group_id: { type: DataTypes.INTEGER, allowNull: false },
   subject_id: { type: DataTypes.INTEGER, allowNull: false }
 }, { timestamps: false })
 
 // 9. Batch Elective Choices
-export const BatchElectiveChoice = sequelize.define('BatchElectiveChoices', {
+export const BatchElectiveChoice = sequelize.define('batchelectivechoices', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   batch_id: { type: DataTypes.INTEGER, allowNull: false },
   elective_group_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -84,7 +84,7 @@ export const BatchElectiveChoice = sequelize.define('BatchElectiveChoices', {
 }, { timestamps: false })
 
 // 10. Faculty
-export const Faculty = sequelize.define('Faculty', {
+export const Faculty = sequelize.define('faculty', {
   faculty_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING(150), allowNull: false },
   email: { type: DataTypes.STRING(150), unique: true },
@@ -94,7 +94,7 @@ export const Faculty = sequelize.define('Faculty', {
 }, { tableName: 'Faculty', timestamps: false })
 
 // 11. Faculty Departments
-export const FacultyDepartment = sequelize.define('FacultyDepartments', {
+export const FacultyDepartment = sequelize.define('facultydepartments', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   faculty_id: { type: DataTypes.INTEGER, allowNull: false },
   department_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -102,7 +102,7 @@ export const FacultyDepartment = sequelize.define('FacultyDepartments', {
 }, { tableName: 'FacultyDepartments', timestamps: false })
 
 // 12. Faculty Availability
-export const FacultyAvailability = sequelize.define('FacultyAvailability', {
+export const FacultyAvailability = sequelize.define('facultyavailability', {
   availability_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   faculty_id: { type: DataTypes.INTEGER, allowNull: false },
   day_of_week: { type: DataTypes.ENUM('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'), allowNull: false },
@@ -113,7 +113,7 @@ export const FacultyAvailability = sequelize.define('FacultyAvailability', {
 }, { tableName: 'FacultyAvailability', timestamps: false })
 
 // 13. Classrooms
-export const Classroom = sequelize.define('Classrooms', {
+export const Classroom = sequelize.define('classrooms', {
   room_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING(100), allowNull: false },
   code: { type: DataTypes.STRING(50) },
@@ -123,7 +123,7 @@ export const Classroom = sequelize.define('Classrooms', {
 }, { tableName: 'Classrooms', timestamps: false })
 
 // 14. Department Constraints
-export const DepartmentConstraint = sequelize.define('DepartmentConstraints', {
+export const DepartmentConstraint = sequelize.define('departmentconstraints', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   department_id: { type: DataTypes.INTEGER, allowNull: false },
   working_start: { type: DataTypes.TIME, defaultValue: '09:00:00' },
@@ -137,7 +137,7 @@ export const DepartmentConstraint = sequelize.define('DepartmentConstraints', {
 }, { tableName: 'DepartmentConstraints', timestamps: false })
 
 // 15. Time Slots
-export const TimeSlot = sequelize.define('TimeSlots', {
+export const TimeSlot = sequelize.define('timeslots', {
   timeslot_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   start_time: { type: DataTypes.TIME, allowNull: false },
   end_time: { type: DataTypes.TIME, allowNull: false },
@@ -145,7 +145,7 @@ export const TimeSlot = sequelize.define('TimeSlots', {
 }, { tableName: 'TimeSlots', timestamps: false })
 
 // 16. Timetable Entries
-export const TimetableEntry = sequelize.define('TimetableEntries', {
+export const TimetableEntry = sequelize.define('timetableentries', {
   timetable_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   academic_year: { type: DataTypes.STRING(9), allowNull: false },
   department_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -165,7 +165,7 @@ export const TimetableEntry = sequelize.define('TimetableEntries', {
 }, { tableName: 'TimetableEntries', timestamps: true, createdAt: 'created_at', updatedAt: false })
 
 // 17. Users
-export const User = sequelize.define('Users', {
+export const User = sequelize.define('users', {
   user_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   email: { type: DataTypes.STRING(150), unique: true, allowNull: false },
   password_hash: { type: DataTypes.STRING(255), allowNull: false },
@@ -175,7 +175,7 @@ export const User = sequelize.define('Users', {
 }, { timestamps: true, createdAt: 'created_at', updatedAt: false })
 
 // 18. Generation Logs
-export const GenerationLog = sequelize.define('GenerationLogs', {
+export const GenerationLog = sequelize.define('generationlogs', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   department_id: { type: DataTypes.INTEGER, allowNull: false },
   academic_year: { type: DataTypes.STRING(9), allowNull: false },
