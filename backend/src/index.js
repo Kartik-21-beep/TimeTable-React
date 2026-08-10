@@ -65,10 +65,9 @@ const port = process.env.PORT || 5000
     console.log('Starting server...')
     await sequelize.authenticate()
     console.log('DB connected')
-    await sequelize.sync()
-    console.log('DB synced')
+   
     app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`)
+      console.log(`Server running on port ${port}`)
     })
   } catch (e) {
     console.error('Failed to start server', e)
