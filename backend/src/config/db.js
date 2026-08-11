@@ -1,3 +1,4 @@
+// used to connect backend with mysql 
 import dotenv from 'dotenv'
 import { Sequelize } from 'sequelize'
 
