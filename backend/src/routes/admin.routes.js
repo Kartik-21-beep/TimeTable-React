@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { departments, programs, semesters, batches, subjects, faculty, classrooms, electiveGroups, timeSlots, academicTerms, electiveSubjects, batchElectiveChoices, departmentConstraints, facultyTeaching, listings } from '../controllers/admin.controller.js'
-import { authRequired } from '../middleware/auth.js'
 
 const r = Router()
 
