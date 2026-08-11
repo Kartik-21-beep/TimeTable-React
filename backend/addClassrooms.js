@@ -1,6 +1,10 @@
 const { sequelize } = require('./src/config/db.js');
 const { Classroom, Department } = require('./src/models/index.js');
 
+
+// this file is just used for testing initially 
+
+
 async function addDefaultClassrooms() {
   try {
     // Get the first department
