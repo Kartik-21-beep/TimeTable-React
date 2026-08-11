@@ -91,7 +91,7 @@ export const Faculty = sequelize.define('faculty', {
   primary_department_id: { type: DataTypes.INTEGER },
   max_load_per_week: { type: DataTypes.INTEGER, defaultValue: 12 },
   is_active: { type: DataTypes.BOOLEAN, defaultValue: true }
-}, { tableName: 'Faculty', timestamps: false })
+}, { tableName: 'faculty', timestamps: false })
 
 // 11. Faculty Departments
 export const FacultyDepartment = sequelize.define('facultydepartments', {
@@ -120,7 +120,7 @@ export const Classroom = sequelize.define('classrooms', {
   type: { type: DataTypes.ENUM('Classroom','Lab','Studio'), allowNull: false },
   capacity: { type: DataTypes.INTEGER, defaultValue: 0 },
   department_id: { type: DataTypes.INTEGER }
-}, { tableName: 'Classrooms', timestamps: false })
+}, { tableName: 'classrooms', timestamps: false })
 
 // 14. Department Constraints
 export const DepartmentConstraint = sequelize.define('departmentconstraints', {
