@@ -134,7 +134,7 @@ export const DepartmentConstraint = sequelize.define('departmentconstraints', {
   slot_duration_minutes: { type: DataTypes.INTEGER, defaultValue: 60 },
   no_weekends: { type: DataTypes.BOOLEAN, defaultValue: true },
   extra_rules: { type: DataTypes.JSON }
-}, { tableName: 'DepartmentConstraints', timestamps: false })
+}, { tableName: 'departmentconstraints', timestamps: false })
 
 // 15. Time Slots
 export const TimeSlot = sequelize.define('timeslots', {
@@ -142,7 +142,7 @@ export const TimeSlot = sequelize.define('timeslots', {
   start_time: { type: DataTypes.TIME, allowNull: false },
   end_time: { type: DataTypes.TIME, allowNull: false },
   label: { type: DataTypes.STRING(50) }
-}, { tableName: 'TimeSlots', timestamps: false })
+}, { tableName: 'timeslots', timestamps: false })
 
 // 16. Timetable Entries
 export const TimetableEntry = sequelize.define('timetableentries', {
