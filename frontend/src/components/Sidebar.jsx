@@ -16,13 +16,15 @@ export default function Sidebar({ role }) {
     return location.pathname.startsWith(path)
   }
 
-  const NavLink = ({ to, children }) => {
+  const NavLink = ({ to, index, children }) => {
     const active = isActive(to)
     return (
       <Link
         to={to}
         style={{
-          display: 'block',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: '10px',
           fontFamily: "'Inter', sans-serif",
           fontSize: '13.5px',
           fontWeight: active ? 600 : 400,
@@ -36,25 +38,51 @@ export default function Sidebar({ role }) {
         onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = PAPER }}
         onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent' }}
       >
+        <span style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '10.5px',
+          color: active ? ACCENT : SLATE,
+          minWidth: '15px'
+        }}>
+          {String(index + 1).padStart(2, '0')}
+        </span>
         {children}
       </Link>
     )
   }
 
-  const Section = ({ title, children }) => (
+  const Section = ({ title, items }) => (
     <div style={{ marginBottom: '22px' }}>
       <div style={{
-        fontFamily: "'IBM Plex Mono', monospace",
-        fontSize: '10px',
-        letterSpacing: '1.5px',
-        textTransform: 'uppercase',
-        color: SLATE,
-        padding: '0 12px 6px 14px'
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        padding: '0 12px 6px 14px',
+        borderBottom: `1px solid ${HAIRLINE}`,
+        marginBottom: '2px',
+        paddingBottom: '7px'
       }}>
-        {title}
+        <span style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '10px',
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          color: SLATE
+        }}>
+          {title}
+        </span>
+        <span style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '9.5px',
+          color: HAIRLINE
+        }}>
+          {String(items.length).padStart(2, '0')}
+        </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {children}
+        {items.map((item, i) => (
+          <NavLink key={item.to} to={item.to} index={i}>{item.label}</NavLink>
+        ))}
       </div>
     </div>
   )
@@ -62,59 +90,59 @@ export default function Sidebar({ role }) {
   return (
     <aside className="sidebar" style={{ borderRight: `1px solid ${HAIRLINE}`, paddingTop: '18px' }}>
       {!role && (
-        <Section title="Auth">
-          <NavLink to="/login">Login</NavLink>
-          <NavLink to="/signup">Signup</NavLink>
-        </Section>
+        <Section title="Auth" items={[
+          { to: '/login', label: 'Login' },
+          { to: '/signup', label: 'Signup' }
+        ]} />
       )}
 
       {role === 'Admin' && (
         <>
-          <Section title="Main">
-            <NavLink to="/admin/dashboard">Dashboard</NavLink>
-          </Section>
+          <Section title="Main" items={[
+            { to: '/admin/dashboard', label: 'Dashboard' }
+          ]} />
 
-          <Section title="Management">
-            <NavLink to="/admin/departments">Departments</NavLink>
-            <NavLink to="/admin/programs">Programs</NavLink>
-            <NavLink to="/admin/batches">Batches</NavLink>
-            <NavLink to="/admin/semesters">Semesters</NavLink>
-            <NavLink to="/admin/subjects">Subjects</NavLink>
-            <NavLink to="/admin/faculty">Faculty</NavLink>
-            <NavLink to="/admin/classrooms">Classrooms</NavLink>
-          </Section>
+          <Section title="Management" items={[
+            { to: '/admin/departments', label: 'Departments' },
+            { to: '/admin/programs', label: 'Programs' },
+            { to: '/admin/batches', label: 'Batches' },
+            { to: '/admin/semesters', label: 'Semesters' },
+            { to: '/admin/subjects', label: 'Subjects' },
+            { to: '/admin/faculty', label: 'Faculty' },
+            { to: '/admin/classrooms', label: 'Classrooms' }
+          ]} />
 
-          <Section title="Electives">
-            <NavLink to="/admin/elective-groups">Elective Groups</NavLink>
-            <NavLink to="/admin/elective-subjects">Elective Subjects</NavLink>
-            <NavLink to="/admin/batch-electives">Batch Elective Choice</NavLink>
-          </Section>
+          <Section title="Electives" items={[
+            { to: '/admin/elective-groups', label: 'Elective Groups' },
+            { to: '/admin/elective-subjects', label: 'Elective Subjects' },
+            { to: '/admin/batch-electives', label: 'Batch Elective Choice' }
+          ]} />
 
-          <Section title="Timetable">
-            <NavLink to="/admin/time-slots">Time Slots</NavLink>
-            <NavLink to="/admin/academic-terms">Academic Terms</NavLink>
-            <NavLink to="/admin/department-constraints">Department Constraints</NavLink>
-            <NavLink to="/admin/generate">Generate Timetable</NavLink>
-            <NavLink to="/admin/clear-timetable">Clear Timetable</NavLink>
-            <NavLink to="/admin/logs">Generation Logs</NavLink>
-          </Section>
+          <Section title="Timetable" items={[
+            { to: '/admin/time-slots', label: 'Time Slots' },
+            { to: '/admin/academic-terms', label: 'Academic Terms' },
+            { to: '/admin/department-constraints', label: 'Department Constraints' },
+            { to: '/admin/generate', label: 'Generate Timetable' },
+            { to: '/admin/clear-timetable', label: 'Clear Timetable' },
+            { to: '/admin/logs', label: 'Generation Logs' }
+          ]} />
         </>
       )}
 
       {role === 'Faculty' && (
-        <Section title="Faculty">
-          <NavLink to="/faculty/dashboard">Dashboard</NavLink>
-          <NavLink to="/faculty/timetable">My Timetable</NavLink>
-          <NavLink to="/faculty/availability">Manage Availability</NavLink>
-        </Section>
+        <Section title="Faculty" items={[
+          { to: '/faculty/dashboard', label: 'Dashboard' },
+          { to: '/faculty/timetable', label: 'My Timetable' },
+          { to: '/faculty/availability', label: 'Manage Availability' }
+        ]} />
       )}
 
       {role === 'Viewer' && (
-        <Section title="Student">
-          <NavLink to="/student/dashboard">Dashboard</NavLink>
-          <NavLink to="/student/timetable">My Timetable</NavLink>
-          <NavLink to="/student/choose-electives">Choose Electives</NavLink>
-        </Section>
+        <Section title="Student" items={[
+          { to: '/student/dashboard', label: 'Dashboard' },
+          { to: '/student/timetable', label: 'My Timetable' },
+          { to: '/student/choose-electives', label: 'Choose Electives' }
+        ]} />
       )}
     </aside>
   )
