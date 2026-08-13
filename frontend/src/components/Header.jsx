@@ -17,7 +17,6 @@ export default function Header({ role }) {
     navigate('/login', { replace: true })
   }
 
-  // Registry-style role codes, same visual language as the dashboard's stat tags
   const roleCode = {
     'Admin': 'ADM',
     'Faculty': 'FAC',
@@ -38,25 +37,18 @@ export default function Header({ role }) {
         color: INK
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '30px',
-          height: '30px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: `1px solid ${INK}`,
-          color: INK
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '10px',
+          letterSpacing: '1px',
+          color: ACCENT,
+          border: `1px solid ${ACCENT}55`,
+          padding: '3px 6px'
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="0" ry="0"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
-          </svg>
-        </div>
-        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '17px', fontWeight: 600, letterSpacing: '-0.2px' }}>
+          STS
+        </span>
+        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '17px', fontWeight: 600, letterSpacing: '-0.2px', color: ACCENT }}>
           Smart Timetable Scheduler
         </div>
       </div>
