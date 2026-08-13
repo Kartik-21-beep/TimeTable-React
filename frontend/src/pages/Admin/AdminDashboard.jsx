@@ -2,9 +2,21 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { get } from '../../api/apiClient'
 
+// Registrar-office palette. One accent, used sparingly.
+const INK = '#1c252b'
+const SLATE = '#5c6b72'
+const HAIRLINE = '#d8dce0'
+const PAPER = '#f7f6f3'
+const ACCENT = '#7a2e2e' // oxford red
+
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+`
+
 export default function AdminDashboard() {
   const [counts, setCounts] = useState({ departments: 0, programs: 0, batches: 0, faculty: 0, subjects: 0, classrooms: 0 })
   const [loading, setLoading] = useState(true)
+  const [now] = useState(() => new Date())
 
   useEffect(() => {
     async function load() {
@@ -17,11 +29,11 @@ export default function AdminDashboard() {
           get('/admin/subjects'),
           get('/admin/classrooms')
         ])
-        setCounts({ 
-          departments: deps.length, 
-          programs: progs.length, 
-          batches: bats.length, 
-          faculty: facs.length, 
+        setCounts({
+          departments: deps.length,
+          programs: progs.length,
+          batches: bats.length,
+          faculty: facs.length,
           subjects: subs.length,
           classrooms: rooms.length
         })
@@ -33,125 +45,181 @@ export default function AdminDashboard() {
     load()
   }, [])
 
-  const stats = [
-    { label: "Departments", value: counts.departments, icon: "🏢", color: "#3b82f6", link: "/admin/departments" },
-    { label: "Programs", value: counts.programs, icon: "📚", color: "#8b5cf6", link: "/admin/programs" },
-    { label: "Batches", value: counts.batches, icon: "👥", color: "#10b981", link: "/admin/batches" },
-    { label: "Faculty", value: counts.faculty, icon: "👨‍🏫", color: "#f59e0b", link: "/admin/faculty" },
-    { label: "Subjects", value: counts.subjects, icon: "📖", color: "#ef4444", link: "/admin/subjects" },
-    { label: "Classrooms", value: counts.classrooms, icon: "🏫", color: "#06b6d4", link: "/admin/classrooms" }
+  const registry = [
+    { code: 'DEPT', label: 'Departments', value: counts.departments, link: '/admin/departments' },
+    { code: 'PROG', label: 'Programs', value: counts.programs, link: '/admin/programs' },
+    { code: 'BATC', label: 'Batches', value: counts.batches, link: '/admin/batches' },
+    { code: 'FAC', label: 'Faculty', value: counts.faculty, link: '/admin/faculty' },
+    { code: 'SUBJ', label: 'Subjects', value: counts.subjects, link: '/admin/subjects' },
+    { code: 'ROOM', label: 'Classrooms', value: counts.classrooms, link: '/admin/classrooms' }
   ]
 
-  const quickActions = [
-    { title: "Generate Timetable", description: "Create a new timetable automatically", icon: "⚡", link: "/admin/generate", color: "#3b82f6" },
-    { title: "Clear Timetable", description: "Remove existing timetable entries", icon: "🗑️", link: "/admin/clear-timetable", color: "#ef4444" }
+  const actions = [
+    { title: 'Generate timetable', description: 'Build a fresh schedule from current data', link: '/admin/generate' },
+    { title: 'Clear timetable', description: 'Remove all existing timetable entries', link: '/admin/clear-timetable' }
   ]
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-      {/* Minimal Header */}
-      <div style={{ marginBottom: '40px', paddingBottom: '16px', borderBottom: '2px solid var(--border)' }}>
-        <h1 style={{ 
-          margin: 0, 
-          fontSize: '36px', 
-          fontWeight: 800, 
-          color: 'var(--text)',
-          letterSpacing: '-1px'
-        }}>
-          Admin Dashboard
-        </h1>
-        <p style={{ margin: '8px 0 0', color: 'var(--muted)', fontSize: '14px' }}>
-          System overview and quick actions
-        </p>
-      </div>
+    <div style={{ maxWidth: '880px', margin: '0 auto', fontFamily: "'Inter', sans-serif", color: INK }}>
+      <style>{FONTS}</style>
 
-      {/* Compact Stats - Line Style */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(6, 1fr)',
-        gap: '16px',
-        marginBottom: '40px'
+      {/* Header, ledger-book style */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        borderBottom: `2px solid ${INK}`,
+        paddingBottom: '14px',
+        marginBottom: '4px'
       }}>
-        {stats.map((stat, idx) => (
-          <Link key={idx} to={stat.link} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{
-              padding: '16px',
-              borderLeft: `4px solid ${stat.color}`,
-              background: 'linear-gradient(to right, ' + stat.color + '08, transparent)',
-              transition: 'all 0.2s',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderLeftWidth = '6px'
-              e.currentTarget.style.background = 'linear-gradient(to right, ' + stat.color + '15, transparent)'
-              e.currentTarget.style.transform = 'translateX(4px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderLeftWidth = '4px'
-              e.currentTarget.style.background = 'linear-gradient(to right, ' + stat.color + '08, transparent)'
-              e.currentTarget.style.transform = 'translateX(0)'
-            }}
+        <div>
+          <div style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: '11px',
+            letterSpacing: '2px',
+            color: SLATE,
+            textTransform: 'uppercase',
+            marginBottom: '6px'
+          }}>
+            Administration · Registry
+          </div>
+          <h1 style={{
+            margin: 0,
+            fontFamily: "'Source Serif 4', serif",
+            fontSize: '34px',
+            fontWeight: 600,
+            letterSpacing: '-0.3px'
+          }}>
+            Dashboard
+          </h1>
+        </div>
+        <div style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '11px',
+          color: SLATE,
+          textAlign: 'right',
+          lineHeight: 1.6
+        }}>
+          {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+        </div>
+      </div>
+
+      {/* Registry table — dot-leader rows like a directory index */}
+      <div style={{ marginTop: '28px', marginBottom: '40px' }}>
+        {registry.map((row, idx) => (
+          <Link
+            key={row.code}
+            to={row.link}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '13px 4px',
+                borderBottom: idx === registry.length - 1 ? 'none' : `1px solid ${HAIRLINE}`,
+                cursor: 'pointer',
+                transition: 'background-color 0.15s ease'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = PAPER }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '20px' }}>{stat.icon}</span>
-                <div style={{
-                  fontSize: '28px',
-                  fontWeight: 800,
-                  color: stat.color,
-                  lineHeight: 1
-                }}>
-                  {loading ? '...' : stat.value}
-                </div>
-              </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                {stat.label}
-              </div>
+              <span style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '10px',
+                letterSpacing: '1px',
+                color: ACCENT,
+                border: `1px solid ${ACCENT}55`,
+                borderRadius: '2px',
+                padding: '3px 6px',
+                minWidth: '38px',
+                textAlign: 'center'
+              }}>
+                {row.code}
+              </span>
+
+              <span style={{ fontSize: '14.5px', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                {row.label}
+              </span>
+
+              <span style={{
+                flex: 1,
+                borderBottom: `1px dotted ${HAIRLINE}`,
+                margin: '0 4px',
+                transform: 'translateY(-4px)'
+              }} />
+
+              <span style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '18px',
+                fontWeight: 500,
+                fontVariantNumeric: 'tabular-nums',
+                minWidth: '32px',
+                textAlign: 'right'
+              }}>
+                {loading ? '–' : row.value}
+              </span>
+
+              <span style={{ fontSize: '13px', color: SLATE, width: '14px', textAlign: 'right' }}>›</span>
             </div>
           </Link>
         ))}
       </div>
 
-      {/* Compact Action Buttons */}
-      <div style={{ display: 'flex', gap: '16px' }}>
-        {quickActions.map((action, idx) => (
-          <Link key={idx} to={action.link} style={{ textDecoration: 'none', flex: 1 }}>
-            <div style={{
-              padding: '20px 24px',
-              border: `2px solid ${action.color}`,
-              borderRadius: '8px',
-              background: '#fff',
-              transition: 'all 0.2s',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = action.color
-              e.currentTarget.style.color = '#fff'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = `0 4px 12px ${action.color}40`
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#fff'
-              e.currentTarget.style.color = 'inherit'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = 'none'
-            }}
+      {/* Actions — instructions, not buttons */}
+      <div>
+        <div style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '11px',
+          letterSpacing: '2px',
+          color: SLATE,
+          textTransform: 'uppercase',
+          marginBottom: '10px'
+        }}>
+          Actions
+        </div>
+        <div style={{ border: `1px solid ${INK}` }}>
+          {actions.map((action, idx) => (
+            <Link
+              key={action.title}
+              to={action.link}
+              style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
             >
-              <span style={{ fontSize: '24px' }}>{action.icon}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '4px' }}>
-                  {action.title}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '18px 20px',
+                  borderBottom: idx === actions.length - 1 ? 'none' : `1px solid ${INK}`,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease, color 0.15s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = INK
+                  e.currentTarget.style.color = PAPER
+                  e.currentTarget.querySelector('.arrow').style.transform = 'translateX(4px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = INK
+                  e.currentTarget.querySelector('.arrow').style.transform = 'translateX(0)'
+                }}
+              >
+                <div>
+                  <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '17px', fontWeight: 600, marginBottom: '3px' }}>
+                    {action.title}
+                  </div>
+                  <div style={{ fontSize: '13px', opacity: 0.75 }}>
+                    {action.description}
+                  </div>
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
-                  {action.description}
-                </div>
+                <span className="arrow" style={{ fontSize: '18px', transition: 'transform 0.15s ease' }}>→</span>
               </div>
-              <span style={{ fontSize: '20px', opacity: 0.6 }}>→</span>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   )
