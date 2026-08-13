@@ -17,6 +17,7 @@ export default function Header({ role }) {
     navigate('/login', { replace: true })
   }
 
+  // Registry-style role codes, same visual language as the dashboard's stat tags
   const roleCode = {
     'Admin': 'ADM',
     'Faculty': 'FAC',
@@ -37,18 +38,8 @@ export default function Header({ role }) {
         color: INK
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span style={{
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '10px',
-          letterSpacing: '1px',
-          color: ACCENT,
-          border: `1px solid ${ACCENT}55`,
-          padding: '3px 6px'
-        }}>
-          STS
-        </span>
-        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '17px', fontWeight: 600, letterSpacing: '-0.2px', color: ACCENT }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '17px', fontWeight: 600, letterSpacing: '-0.2px', color: '#000' }}>
           Smart Timetable Scheduler
         </div>
       </div>
