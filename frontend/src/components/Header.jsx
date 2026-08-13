@@ -1,7 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 
+const INK = '#1c252b'
+const SLATE = '#5c6b72'
+const HAIRLINE = '#d8dce0'
+const PAPER = '#f7f6f3'
+const ACCENT = '#7a2e2e'
+
 export default function Header({ role }) {
   const navigate = useNavigate()
+
   const onLogout = () => {
     // Clear all authentication data
     localStorage.removeItem('auth')
@@ -9,63 +16,102 @@ export default function Header({ role }) {
     // Navigate to login page and replace the current history entry
     navigate('/login', { replace: true })
   }
-  
-  const roleBadge = {
-    'Admin': { emoji: '👨‍💼', color: '#3b82f6' },
-    'Faculty': { emoji: '👨‍🏫', color: '#8b5cf6' },
-    'Viewer': { emoji: '👨‍🎓', color: '#10b981' }
+
+  // Registry-style role codes, same visual language as the dashboard's stat tags
+  const roleCode = {
+    'Admin': 'ADM',
+    'Faculty': 'FAC',
+    'Viewer': 'VWR'
   }
-  
-  const currentRole = roleBadge[role] || { emoji: '👤', color: '#64748b' }
-  
+  const code = roleCode[role] || 'USR'
+
   return (
-    <header className="header">
+    <header
+      className="header"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '14px 4px',
+        borderBottom: `2px solid ${INK}`,
+        fontFamily: "'Inter', sans-serif",
+        color: INK
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ 
-          width: '32px', 
-          height: '32px', 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          width: '30px',
+          height: '30px',
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%)',
-          borderRadius: '8px',
-          color: '#fff',
-          fontSize: '18px',
-          fontWeight: 600
+          border: `1px solid ${INK}`,
+          color: INK
         }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="0" ry="0"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
             <line x1="8" y1="2" x2="8" y2="6"></line>
             <line x1="3" y1="10" x2="21" y2="10"></line>
             <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
           </svg>
         </div>
-        <div>Smart Timetable Scheduler</div>
+        <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '17px', fontWeight: 600, letterSpacing: '-0.2px' }}>
+          Smart Timetable Scheduler
+        </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         {role && (
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
             gap: '8px',
-            padding: '6px 12px',
-            background: `${currentRole.color}15`,
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: 500,
-            color: currentRole.color
+            padding: '5px 5px 5px 10px'
           }}>
-            <span>{currentRole.emoji}</span>
-            <span>{role}</span>
+            <span style={{ fontSize: '13px', color: SLATE }}>{role}</span>
+            <span style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '10px',
+              letterSpacing: '1px',
+              color: ACCENT,
+              border: `1px solid ${ACCENT}55`,
+              padding: '3px 6px',
+              minWidth: '32px',
+              textAlign: 'center'
+            }}>
+              {code}
+            </span>
           </div>
         )}
-        <button className="btn ghost" onClick={onLogout} style={{ fontSize: '14px' }}>
+
+        <button
+          onClick={onLogout}
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: '13px',
+            fontWeight: 500,
+            color: INK,
+            background: 'transparent',
+            border: `1px solid ${HAIRLINE}`,
+            padding: '7px 14px',
+            cursor: 'pointer',
+            transition: 'background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = INK
+            e.currentTarget.style.color = PAPER
+            e.currentTarget.style.borderColor = INK
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = INK
+            e.currentTarget.style.borderColor = HAIRLINE
+          }}
+        >
           Logout
         </button>
       </div>
     </header>
   )
 }
-
-
